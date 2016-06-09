@@ -169,12 +169,111 @@ var COW *SoundCollection = &SoundCollection{
 	},
 }
 
+var HOLA *SoundCollection = &SoundCollection{
+  Prefix: "hola",
+  Commands: []string{
+    "!hola",
+    "!bitches",
+  },
+  Sounds: []*Sound{
+    createSound("hola", 10, 250),
+  },
+}
+
+var LINUX *SoundCollection = &SoundCollection{
+  Prefix: "linux",
+  Commands: []string{
+    "!linux",
+  },
+  Sounds: []*Sound{
+    createSound("linux", 10, 250),
+  },
+}
+
+var CHALLANGED *SoundCollection = &SoundCollection{
+  Prefix: "challanged",
+  Commands: []string{
+    "!challenged",
+  },
+  Sounds: []*Sound{
+    createSound("challenged", 10, 250),
+  },
+}
+
+var DEGENERATE *SoundCollection = &SoundCollection{
+  Prefix: "degenerate",
+  Commands: []string{
+    "!degenerate",
+  },
+  Sounds: []*Sound{
+    createSound("degenerate", 10, 250),
+  },
+}
+
+var YEE *SoundCollection = &SoundCollection{
+  Prefix: "yee",
+  Commands: []string{
+    "!yee",
+  },
+  Sounds: []*Sound{
+    createSound("yee", 10, 250),
+  },
+}
+
+var END *SoundCollection = &SoundCollection{
+  Prefix: "end",
+  Commands: []string{
+    "!butintheend",
+  },
+  Sounds: []*Sound{
+    createSound("end", 10, 250),
+  },
+}
+
+var HARD *SoundCollection = &SoundCollection{
+  Prefix: "hard",
+  Commands: []string{
+    "!itriedsohard",
+  },
+  Sounds: []*Sound{
+    createSound("hard", 10, 250),
+  },
+}
+
+var DARKNESS *SoundCollection = &SoundCollection{
+  Prefix: "darkness",
+  Commands: []string{
+    "!hellodarkness",
+  },
+  Sounds: []*Sound{
+    createSound("darkness", 10, 250),
+  },
+}
+
+var MOM *SoundCollection = &SoundCollection{
+  Prefix: "mom",
+  Commands: []string{
+    "!whymomdoesn't",
+  },
+  Sounds: []*Sound{
+    createSound("mom", 10, 250),
+  },
+}
 var COLLECTIONS []*SoundCollection = []*SoundCollection{
 	AIRHORN,
 	KHALED,
 	CENA,
 	ETHAN,
 	COW,
+    HOLA,
+    LINUX,
+    CHALLANGED,
+	DEGENERATE,
+	YEE,
+	END,
+	HARD,
+	DARKNESS,
+	MOM,
 }
 
 // Create a Sound struct
@@ -766,3 +865,4 @@ func main() {
 	signal.Notify(c, os.Interrupt, os.Kill)
 	<-c
 }
+
