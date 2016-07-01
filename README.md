@@ -1,5 +1,7 @@
 # Airhorn Bot
-Airhorn is an example implementation of the [Discord API](https://discordapp.com/developers/docs/intro). Airhorn bot utilizes the [discordgo](https://github.com/bwmarrin/discordgo) library, a free and open source library. Airhorn Bot requires Go 1.4 or higher.
+Airhorn is an example implementation of the [Discord API](https://discordapp.com/developers/docs/intro). Airhorn bot utilizes the [discordgo](https://github.com/bwmarrin/discordgo) library, a free and open source library. Airhorn Bot requires Go 1.4 or higher. 
+
+I have added some extra sounds to the bot, for my enjoyment.
 
 ## Usage
 Airhorn Bot has two components, a bot client that handles the playing of loyal airhorns, and a web server that implements OAuth2 and stats. Once added to your server, airhorn bot can be summoned by running `!airhorn`.
@@ -9,14 +11,15 @@ Airhorn Bot has two components, a bot client that handles the playing of loyal a
 
 **First install the bot:**
 ```
-go get github.com/hammerandchisel/airhornbot/cmd/bot
-go install github.com/hammerandchisel/airhornbot/cmd/bot
+go get github.com/mathboy19/airhornbot/cmd/bot
+go install github.com/mathboy19/airhornbot/cmd/bot
 ```
  **Then run the following command:**
 
 ```
 bot -r "localhost:6379" -t "MY_BOT_ACCOUNT_TOKEN" -o OWNER_ID
 ```
+ **You can use the template at start.sh.template to create a simple start script for your bot**
 
 ### Running the Web Server
 First install the webserver: `go install github.com/hammerandchisel/airhornbot`, then run `make static`, finally run:

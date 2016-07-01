@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Starting Discord Bot"
+
+./bot -t "TOKEN" -o OWNER_ID
