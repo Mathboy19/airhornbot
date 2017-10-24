@@ -3,6 +3,8 @@ Airhorn is an example implementation of the [Discord API](https://discordapp.com
 
 I have added some extra sounds to the bot, for my enjoyment.
 
+This project is no longer active nor maintained, feel free to fork or build your own!
+
 ## Usage
 Airhorn Bot has two components, a bot client that handles the playing of loyal airhorns, and a web server that implements OAuth2 and stats. Once added to your server, airhorn bot can be summoned by running `!airhorn`.
 

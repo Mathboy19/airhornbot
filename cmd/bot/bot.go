@@ -37,9 +37,6 @@ var (
 
 	// Owner
 	OWNER string
-
-	// Shard (or -1)
-	SHARDS []string = make([]string, 0)
 )
 
 // Play represents an individual use of the !airhorn command
@@ -259,13 +256,38 @@ var MOM *SoundCollection = &SoundCollection{
     createSound("mom", 10, 250),
   },
 }
+var BIRTHDAY *SoundCollection = &SoundCollection{
+	Prefix: "birthday",
+	Commands: []string{
+		"!birthday",
+		"!bday",
+	},
+	Sounds: []*Sound{
+		createSound("horn", 50, 250),
+		createSound("horn3", 30, 250),
+		createSound("sadhorn", 25, 250),
+		createSound("weakhorn", 25, 250),
+	},
+}
+
+var WOW *SoundCollection = &SoundCollection{
+	Prefix: "wow",
+	Commands: []string{
+		"!wowthatscool",
+		"!wtc",
+	},
+	Sounds: []*Sound{
+		createSound("thatscool", 50, 250),
+	},
+}
+
 var COLLECTIONS []*SoundCollection = []*SoundCollection{
 	AIRHORN,
 	KHALED,
 	CENA,
 	ETHAN,
 	COW,
-    HOLA,
+        HOLA,
     LINUX,
     CHALLANGED,
 	DEGENERATE,
@@ -274,6 +296,8 @@ var COLLECTIONS []*SoundCollection = []*SoundCollection{
 	HARD,
 	DARKNESS,
 	MOM,
+	BIRTHDAY,
+	WOW,
 }
 
 // Create a Sound struct
@@ -374,21 +398,6 @@ func getCurrentVoiceChannel(user *discordgo.User, guild *discordgo.Guild) *disco
 		}
 	}
 	return nil
-}
-
-// Whether a guild id is in this shard
-func shardContains(guildid string) bool {
-	if len(SHARDS) != 0 {
-		ok := false
-		for _, shard := range SHARDS {
-			if len(guildid) >= 5 && string(guildid[len(guildid)-5]) == shard {
-				ok = true
-				break
-			}
-		}
-		return ok
-	}
-	return true
 }
 
 // Returns a random integer between min and max
@@ -550,23 +559,6 @@ func onReady(s *discordgo.Session, event *discordgo.Ready) {
 	s.UpdateStatus(0, "airhornbot.com")
 }
 
-func onGuildCreate(s *discordgo.Session, event *discordgo.GuildCreate) {
-	if !shardContains(event.Guild.ID) {
-		return
-	}
-
-	if event.Guild.Unavailable != nil {
-		return
-	}
-
-	for _, channel := range event.Guild.Channels {
-		if channel.ID == event.Guild.ID {
-			s.ChannelMessageSend(channel.ID, "**AIRHORN BOT READY FOR HORNING. TYPE `!AIRHORN` WHILE IN A VOICE CHANNEL TO ACTIVATE**")
-			return
-		}
-	}
-}
-
 func scontains(key string, options ...string) bool {
 	for _, item := range options {
 		if item == key {
@@ -604,7 +596,6 @@ func displayBotStats(cid string) {
 	fmt.Fprintf(w, "Tasks: \t%d\n", runtime.NumGoroutine())
 	fmt.Fprintf(w, "Servers: \t%d\n", len(discord.State.Ready.Guilds))
 	fmt.Fprintf(w, "Users: \t%d\n", users)
-	fmt.Fprintf(w, "Shards: \t%s\n", strings.Join(SHARDS, ", "))
 	fmt.Fprintf(w, "```\n")
 	w.Flush()
 	discord.ChannelMessageSend(cid, buf.String())
@@ -658,35 +649,11 @@ func utilGetMentioned(s *discordgo.Session, m *discordgo.MessageCreate) *discord
 	return nil
 }
 
-func airhornBomb(cid string, guild *discordgo.Guild, user *discordgo.User, cs string) {
-	count, _ := strconv.Atoi(cs)
-	discord.ChannelMessageSend(cid, ":ok_hand:"+strings.Repeat(":trumpet:", count))
-
-	// Cap it at something
-	if count > 100 {
-		return
-	}
-
-	play := createPlay(user, guild, AIRHORN, nil)
-	vc, err := discord.ChannelVoiceJoin(play.GuildID, play.ChannelID, true, true)
-	if err != nil {
-		return
-	}
-
-	for i := 0; i < count; i++ {
-		AIRHORN.Random().Play(vc)
-	}
-
-	vc.Disconnect()
-}
-
 // Handles bot operator messages, should be refactored (lmao)
 func handleBotControlMessages(s *discordgo.Session, m *discordgo.MessageCreate, parts []string, g *discordgo.Guild) {
-	ourShard := shardContains(g.ID)
-
-	if scontains(parts[1], "status") && ourShard {
+	if scontains(parts[1], "status") {
 		displayBotStats(m.ChannelID)
-	} else if scontains(parts[1], "stats") && ourShard {
+	} else if scontains(parts[1], "stats") {
 		if len(m.Mentions) >= 2 {
 			displayUserStats(m.ChannelID, utilGetMentioned(s, m).ID)
 		} else if len(parts) >= 3 {
@@ -694,24 +661,10 @@ func handleBotControlMessages(s *discordgo.Session, m *discordgo.MessageCreate, 
 		} else {
 			displayServerStats(m.ChannelID, g.ID)
 		}
-	} else if scontains(parts[1], "bomb") && len(parts) >= 4 && ourShard {
-		airhornBomb(m.ChannelID, g, utilGetMentioned(s, m), parts[3])
-	} else if scontains(parts[1], "shards") {
-		guilds := 0
-		for _, guild := range s.State.Ready.Guilds {
-			if shardContains(guild.ID) {
-				guilds += 1
-			}
-		}
-		s.ChannelMessageSend(m.ChannelID, fmt.Sprintf(
-			"Shard %v contains %v servers",
-			strings.Join(SHARDS, ","),
-			guilds))
-	} else if scontains(parts[1], "aps") && ourShard {
+	} else if scontains(parts[1], "aps") {
 		s.ChannelMessageSend(m.ChannelID, ":ok_hand: give me a sec m8")
 		go calculateAirhornsPerSecond(m.ChannelID)
 	}
-	return
 }
 
 func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -757,11 +710,6 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	// If it's not relevant to our shard, just exit
-	if !shardContains(guild.ID) {
-		return
-	}
-
 	// Find the collection for the command we got
 	for _, coll := range COLLECTIONS {
 		if scontains(parts[0], coll.Commands...) {
@@ -788,31 +736,17 @@ func onMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func main() {
 	var (
-		Token = flag.String("t", "", "Discord Authentication Token")
-		Redis = flag.String("r", "", "Redis Connection String")
-		Shard = flag.String("s", "", "Integers to shard by")
-		Owner = flag.String("o", "", "Owner ID")
-		err   error
+		Token      = flag.String("t", "", "Discord Authentication Token")
+		Redis      = flag.String("r", "", "Redis Connection String")
+		Shard      = flag.String("s", "", "Shard ID")
+		ShardCount = flag.String("c", "", "Number of shards")
+		Owner      = flag.String("o", "", "Owner ID")
+		err        error
 	)
 	flag.Parse()
 
 	if *Owner != "" {
 		OWNER = *Owner
-	}
-
-	// Make sure shard is either empty, or an integer
-	if *Shard != "" {
-		SHARDS = strings.Split(*Shard, ",")
-
-		for _, shard := range SHARDS {
-			if _, err := strconv.Atoi(shard); err != nil {
-				log.WithFields(log.Fields{
-					"shard": shard,
-					"error": err,
-				}).Fatal("Invalid Shard")
-				return
-			}
-		}
 	}
 
 	// Preload all the sounds
@@ -845,8 +779,15 @@ func main() {
 		return
 	}
 
+	// Set sharding info
+	discord.ShardID, _ = strconv.Atoi(*Shard)
+	discord.ShardCount, _ = strconv.Atoi(*ShardCount)
+
+	if discord.ShardCount <= 0 {
+		discord.ShardCount = 1
+	}
+
 	discord.AddHandler(onReady)
-	discord.AddHandler(onGuildCreate)
 	discord.AddHandler(onMessageCreate)
 
 	err = discord.Open()
